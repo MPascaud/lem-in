@@ -6,7 +6,7 @@
 /*   By: mpascaud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/10 20:29:32 by mpascaud          #+#    #+#             */
-/*   Updated: 2018/04/17 18:09:43 by mpascaud         ###   ########.fr       */
+/*   Updated: 2018/04/17 19:27:03 by mpascaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,12 +131,23 @@ void	ft_name(t_filist *filist, t_roomlist *roomlist)
 
 void	ft_show_roomlist(t_roomlist *roomlist)
 {
+	int		i;
+
+	i = 0;
 	roomlist = roomlist->next;
 	while (roomlist != NULL)
 	{
-		printf("%s\n", roomlist->name);
-		printf("%d\n", roomlist->place);
+		printf("roomlist->name = %s\n", roomlist->name);
+		printf("roomlist->place = %d\n", roomlist->place);
+		while ((roomlist->tunnels)[i] != NULL)
+		{
+			printf("roomlist->tunnels[%d] = %s\n", i, roomlist->tunnels[i]);
+			i++;
+		}
+		printf("\n");
+		i = 0;
 		roomlist = roomlist->next;
+
 	}
 }
 
@@ -225,6 +236,40 @@ int		ft_disiz_tunnel(t_filist *filist, t_roomlist *roomlist)
 }
 
 
+char	*ft_link(t_filist *filist, t_roomlist *roomlist)
+{
+	char	*tunname;
+	int		i;
+	int		start;
+	int		tmp;
+
+	i = 0;
+	start = 0;
+	tmp = 0;
+	while ((filist->line)[start] != '-')
+		start++;
+	start++;
+	tmp = start;
+	while ((filist->line)[tmp] != '\0')
+	{
+		tmp++;
+		i++;
+	}
+	printf("i = %d\n", i);
+	tunname = (char*)malloc(sizeof(char) * (i + 1));
+	tmp = start;
+	i = 0;
+	while ((filist->line)[tmp] != '\0')
+	{
+		tunname[i] = (filist->line)[tmp];
+		i++;
+		tmp++;
+	}
+	tunname[i] = '\0';
+	return (tunname);
+}
+
+
 void	ft_place(t_filist *filist, t_roomlist *roomlist)
 {
 	int		i;
@@ -268,13 +313,31 @@ void	ft_place(t_filist *filist, t_roomlist *roomlist)
 			filist = filist->next;
 		}
 		printf("tunnbr = %d, roomlist->name = %s\n", tunnbr, roomlist->name);
-		roomlist->tunnels = (char**)malloc(sizeof(char*) * tunnbr);
+		roomlist->tunnels = (char**)malloc(sizeof(char*) * (tunnbr + 1));
 		roomlist = roomlist->next;
 		filist = filistart;
 		tunnbr = 0;
 	}
 
 	roomlist = roomlistart;
+	i = 0;
+	while (roomlist != NULL)
+	{
+		while (filist != NULL)
+		{
+			if (ft_disiz_tunnel(filist, roomlist) == 1)
+			{
+				(roomlist->tunnels)[i] = ft_link(filist, roomlist);
+				i++;
+
+			}
+			filist = filist->next;
+		}
+		roomlist->tunnels[i] = NULL;
+		roomlist = roomlist->next;
+		filist = filistart;
+		i = 0;
+	}
 
 }
 
