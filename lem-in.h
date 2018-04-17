@@ -6,7 +6,7 @@
 /*   By: mpascaud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/10 20:44:23 by mpascaud          #+#    #+#             */
-/*   Updated: 2018/04/16 16:11:28 by mpascaud         ###   ########.fr       */
+/*   Updated: 2018/04/17 15:23:00 by mpascaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ size_t			ft_strlen(const char *s);
 char			*ft_strcpy(char *dest, const char *src);
 char			*ft_strncat(char *dest, const char *src, size_t n);
 int				ft_isdigit(int c);
+char			*ft_strstr(const char *haystack, const char *needle);
 
 typedef struct	s_filist
 {
@@ -41,8 +42,9 @@ typedef struct	s_filist
 
 typedef struct	s_roomlist
 {
-	int		place;
-	char	*name;
+	char				**tunnels;
+	unsigned int		place;
+	char				*name;
 	struct	s_roomlist	*previous;
 	struct	s_roomlist	*next;
 }				t_roomlist;

@@ -6,7 +6,7 @@
 /*   By: mpascaud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/10 20:29:32 by mpascaud          #+#    #+#             */
-/*   Updated: 2018/04/16 17:50:12 by mpascaud         ###   ########.fr       */
+/*   Updated: 2018/04/17 18:09:43 by mpascaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ t_roomlist	*ft_roomlstnew(t_roomlist *roomlist)
 	if (!(nextlink = (t_roomlist*)malloc(sizeof(t_roomlist))))
 		return (NULL);
 	nextlink->previous = roomlist;
+	nextlink->place = -1;
 	nextlink->next = NULL;
 	return (nextlink);
 }
@@ -134,9 +135,149 @@ void	ft_show_roomlist(t_roomlist *roomlist)
 	while (roomlist != NULL)
 	{
 		printf("%s\n", roomlist->name);
+		printf("%d\n", roomlist->place);
 		roomlist = roomlist->next;
 	}
 }
+
+
+int		ft_disizit(t_filist *filist, t_roomlist *roomlist)
+{
+	int		i;
+
+	i = 0;
+	while ((roomlist->name)[i] != '\0')
+	{
+		if ((roomlist->name)[i] != (filist->line)[i])
+		{
+			return (0);
+		}
+		i++;
+	}
+	if (filist->line[i] != ' ' || ft_isdigit(filist->line[i + 1]) == 0)
+		return (0);
+	return (1);
+}
+
+
+void	ft_place_start(t_filist *filist, t_roomlist *roomlist)
+{
+	int		i;
+
+	i = 0;
+	filist = filist->next;
+	roomlist = roomlist->next;
+	while (filist != NULL)
+	{
+		if (ft_strstr(filist->line, "##start"))
+		{
+			//printf("COUCOU\n");
+			filist = filist->next;
+			while (roomlist != NULL)
+			{
+				if (ft_disizit(filist, roomlist) == 1)
+				{
+					roomlist->place = 0;
+					return ;
+				}
+				roomlist = roomlist->next;
+			}
+
+		}
+		filist = filist->next;
+	}
+
+}
+
+//liste des tubes avec un 'pris en compte'
+//tant que tous les tubes ne sont pas pris en compte
+//a chaque ligne : si place du 2e = -1 et que place du 1er != -1, place du 2e = place du 1er + 1
+//tour supplementaire sur liste tubes pour calculer taille du malloc du premier(roomlist->tunnel)
+//refaire un tour pour joindre roomlist: les 2e sont ajoutes a la liste du 1er
+//
+
+
+int		ft_disiz_tunnel(t_filist *filist, t_roomlist *roomlist)
+{
+	int		there_is_tunnel;
+	int		i;
+
+	there_is_tunnel = 0;
+	i = 0;
+
+	while ((filist->line)[i] != '\0')
+	{
+		if ((filist->line)[i] == '-')
+			there_is_tunnel = 1;
+		i++;
+	}
+	if (there_is_tunnel == 0)
+		return (0);
+
+	i = 0;
+	while ((roomlist->name)[i] != '\0')
+	{
+		if ((filist->line)[i] != (roomlist->name)[i] || filist->line[i] == '\0')
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
+
+void	ft_place(t_filist *filist, t_roomlist *roomlist)
+{
+	int		i;
+	int		tunnbr;
+	t_filist	*filistart;
+	t_roomlist	*roomlistart;
+
+	i = 0;
+	tunnbr = 0;
+	filist = filist->next;
+	filistart = filist;
+	roomlist = roomlist->next;
+	roomlistart = roomlist;
+	while (filist != NULL)
+	{
+		while ((filist->line)[i] != '\0')
+		{
+			if ((filist->line)[i] == '-' && (filist->line)[0] != '#')
+			{
+				tunnbr++;
+				break ;
+			}
+			i++;
+		}
+		filist = filist->next;
+		i = 0;
+	}
+	//printf("i = %d\n", i);
+	//printf("tunnbr = %d\n", tunnbr);
+	tunnbr = 0;
+	filist = filistart;
+	while (roomlist != NULL)
+	{
+		while (filist != NULL)
+		{
+			if (ft_disiz_tunnel(filist, roomlist) == 1)
+			{
+				//printf("tunnbr = %d, roomlist->name = %s\n", tunnbr, roomlist->name);
+				tunnbr++;
+			}
+			filist = filist->next;
+		}
+		printf("tunnbr = %d, roomlist->name = %s\n", tunnbr, roomlist->name);
+		roomlist->tunnels = (char**)malloc(sizeof(char*) * tunnbr);
+		roomlist = roomlist->next;
+		filist = filistart;
+		tunnbr = 0;
+	}
+
+	roomlist = roomlistart;
+
+}
+
 
 int		main(void)
 {
@@ -171,8 +312,8 @@ int		main(void)
 	roomlist->previous = NULL;
 	roomlist->next = NULL;
 	ft_name(filistart, roomlist);
-
-
+	ft_place_start(filistart, roomlist);
+	ft_place(filistart, roomlist);
 	ft_show_roomlist(roomlist);
 
 
