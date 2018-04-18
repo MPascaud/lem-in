@@ -6,7 +6,7 @@
 /*   By: mpascaud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/10 20:44:23 by mpascaud          #+#    #+#             */
-/*   Updated: 2018/04/17 21:33:17 by mpascaud         ###   ########.fr       */
+/*   Updated: 2018/04/18 20:30:05 by mpascaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,8 @@ char			*ft_strcpy(char *dest, const char *src);
 char			*ft_strncat(char *dest, const char *src, size_t n);
 int				ft_isdigit(int c);
 char			*ft_strstr(const char *haystack, const char *needle);
+int				ft_strcmp(const char *s1, const char *s2);
+
 
 typedef struct	s_filist
 {

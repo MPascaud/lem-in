@@ -6,7 +6,7 @@
 /*   By: mpascaud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/10 20:29:32 by mpascaud          #+#    #+#             */
-/*   Updated: 2018/04/18 18:15:04 by mpascaud         ###   ########.fr       */
+/*   Updated: 2018/04/18 21:50:58 by mpascaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -204,6 +204,29 @@ void	ft_place_start(t_filist *filist, t_roomlist *roomlist)
 		filist = filist->next;
 	}
 
+}
+
+void	ft_place_end(t_filist *filist, t_roomlist *roomlist)
+{
+	filist = filist->next;
+	roomlist = roomlist->next;
+	while (filist != NULL)
+	{
+		if (ft_strstr(filist->line, "##end"))
+		{
+			filist = filist->next;
+			while (roomlist != NULL)
+			{
+				if (ft_disizit(filist, roomlist) == 1)
+				{
+					roomlist->place = -2;
+					return ;
+				}
+				roomlist = roomlist->next;
+			}
+		}
+		filist = filist->next;
+	}
 }
 
 //liste des tubes avec un 'pris en compte'
@@ -462,6 +485,94 @@ void	ft_tunnels(t_filist *filist, t_roomlist *roomlist)
 //refaisage
 
 
+//defilement roomlist
+//pour chacun : defilement des precedents; si precedent->place != -1 et -2, place = precedent->place + 1
+
+
+void	ft_check_previous_place(t_roomlist *roomlist, int i, t_roomlist *roomlistart)
+{
+	int		empty;
+
+	empty = 0;
+	roomlistart = roomlistart->next;
+	while (roomlistart != NULL)
+	{
+		if (ft_strcmp((roomlist->beftunnels)[i], roomlistart->name) == 0)
+		{
+			//printf("roomlistart->name = %s, (roomlist->beftunnels)[i] = %s, i = %d \n", roomlistart->name, (roomlist->beftunnels)[i], i);
+			if (roomlistart->place == -1 && roomlist->place != -2)
+			{
+				roomlistart->place = roomlist->place + 1;
+				return ;
+			}
+		}
+		roomlistart = roomlistart->next;
+	}
+	//return 1 si place = -1
+}
+
+void	ft_check_next_place(t_roomlist *roomlist, int i, t_roomlist *roomlistart)
+{
+	roomlistart = roomlistart->next;
+	while (roomlistart != NULL)
+	{
+		if (ft_strcmp((roomlist->tunnels)[i], roomlistart->name) == 0)
+		{
+			if ((roomlistart->place == -1 || (roomlistart->place > roomlist->place + 1)) && roomlist->place != -2)
+			{
+				roomlistart->place = roomlist->place + 1;
+				return ;
+			}
+		}
+		roomlistart = roomlistart->next;
+	}
+}
+
+
+void	ft_place(t_filist *filist, t_roomlist* roomlist)
+{
+	int			i;
+	t_filist	*filistart;
+	t_roomlist	*roomlistart;
+
+	i = 0;
+	filistart = filist;
+	roomlistart = roomlist;
+	filist = filist->next;
+	roomlist = roomlist->next;
+
+	while (roomlist != NULL)
+	{
+		while ((roomlist->beftunnels)[i] != NULL)
+		{
+			ft_check_previous_place(roomlist, i, roomlistart);
+			//if (ft_check_previous_place(roomlist, i, roomlistart) == 1)
+			//{
+			//	ft_change_previous_place(roomlist);
+				//roomlist = roomlistart;
+			//	break ;
+			//}
+			i++;
+		}
+		i = 0;
+		roomlist = roomlist->next;
+	}
+
+	roomlist = roomlistart;
+	roomlist = roomlist->next;
+	i = 0;
+	while (roomlist != NULL)
+	{
+		while ((roomlist->tunnels)[i] != NULL)
+		{
+			ft_check_next_place(roomlist, i, roomlistart);
+			i++;
+		}
+		i = 0;
+		roomlist = roomlist->next;
+	}
+}
+
 int		main(void)
 {
 	char		*tmp;
@@ -496,9 +607,12 @@ int		main(void)
 	roomlist->next = NULL;
 	ft_name(filistart, roomlist);
 	ft_place_start(filistart, roomlist);
+	ft_place_end(filistart, roomlist);
 	ft_tunnels(filistart, roomlist);
-	ft_show_roomlist(roomlist);
 
+	ft_place(filistart, roomlist);
+
+	ft_show_roomlist(roomlist);
 
 
 
