@@ -6,7 +6,7 @@
 /*   By: mpascaud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/10 20:29:32 by mpascaud          #+#    #+#             */
-/*   Updated: 2018/04/18 23:30:17 by mpascaud         ###   ########.fr       */
+/*   Updated: 2018/04/18 23:48:20 by mpascaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -507,7 +507,7 @@ void	ft_check_previous_place(t_roomlist *roomlist, int i, t_roomlist *roomlistar
 		if (ft_strcmp((roomlist->beftunnels)[i], roomlistart->name) == 0)
 		{
 			//printf("roomlistart->name = %s, (roomlist->beftunnels)[i] = %s, i = %d \n", roomlistart->name, (roomlist->beftunnels)[i], i);
-			if (roomlistart->place == -1 && roomlist->place != -2)
+			if (roomlistart->place == -1 && (roomlist->place != -2) && roomlist->place != -1)
 			{
 				roomlistart->place = roomlist->place + 1;
 				return ;
@@ -525,7 +525,7 @@ void	ft_check_next_place(t_roomlist *roomlist, int i, t_roomlist *roomlistart)
 	{
 		if (ft_strcmp((roomlist->tunnels)[i], roomlistart->name) == 0)
 		{
-			if ((roomlistart->place == -1 || (roomlistart->place > roomlist->place + 1)) && roomlist->place != -2)
+			if ((roomlistart->place == -1 || (roomlistart->place > roomlist->place + 1)) && roomlist->place != -2 && roomlist->place != -1)
 			{
 				roomlistart->place = roomlist->place + 1;
 				return ;
