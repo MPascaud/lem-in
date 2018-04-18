@@ -6,7 +6,7 @@
 /*   By: mpascaud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/10 20:29:32 by mpascaud          #+#    #+#             */
-/*   Updated: 2018/04/17 19:27:03 by mpascaud         ###   ########.fr       */
+/*   Updated: 2018/04/18 18:15:04 by mpascaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,6 +139,12 @@ void	ft_show_roomlist(t_roomlist *roomlist)
 	{
 		printf("roomlist->name = %s\n", roomlist->name);
 		printf("roomlist->place = %d\n", roomlist->place);
+		while ((roomlist->beftunnels)[i] != NULL)
+		{
+			printf("roomlist->beftunnels[%d] = %s\n", i, roomlist->beftunnels[i]);
+			i++;
+		}
+		i = 0;
 		while ((roomlist->tunnels)[i] != NULL)
 		{
 			printf("roomlist->tunnels[%d] = %s\n", i, roomlist->tunnels[i]);
@@ -208,6 +214,8 @@ void	ft_place_start(t_filist *filist, t_roomlist *roomlist)
 //
 
 
+
+
 int		ft_disiz_tunnel(t_filist *filist, t_roomlist *roomlist)
 {
 	int		there_is_tunnel;
@@ -228,13 +236,48 @@ int		ft_disiz_tunnel(t_filist *filist, t_roomlist *roomlist)
 	i = 0;
 	while ((roomlist->name)[i] != '\0')
 	{
-		if ((filist->line)[i] != (roomlist->name)[i] || filist->line[i] == '\0')
+		if ((filist->line)[i] != (roomlist->name)[i] || (filist->line)[i] == '\0')
 			return (0);
 		i++;
 	}
 	return (1);
 }
 
+int		ft_disiz_beftunnel(t_filist *filist, t_roomlist *roomlist)
+{
+	int		there_is_tunnel;
+	int		i;
+	int		j;
+
+	there_is_tunnel = 0;
+	i = 0;
+	j = 0;
+	while ((filist->line)[i] != '\0')
+	{
+		if ((filist->line)[i] == '-')
+		{
+			there_is_tunnel = 1;
+			i++;
+			break ;
+		}
+		i++;
+	}
+	if (there_is_tunnel == 0)
+		return (0);
+//	printf("coucou i = %d\n", i);
+//	i = 0;
+
+	while ((roomlist->name)[j] != '\0')
+	{
+		if ((filist->line)[i] != (roomlist->name)[j] || (filist->line)[i] == '\0')
+			return (0);
+		i++;
+		j++;
+	}
+//	printf("filist->line = %s, roomlist->name = %s\n", filist->line, roomlist->name);
+
+	return (1);
+}
 
 char	*ft_link(t_filist *filist, t_roomlist *roomlist)
 {
@@ -255,7 +298,7 @@ char	*ft_link(t_filist *filist, t_roomlist *roomlist)
 		tmp++;
 		i++;
 	}
-	printf("i = %d\n", i);
+	//printf("i = %d\n", i);
 	tunname = (char*)malloc(sizeof(char) * (i + 1));
 	tmp = start;
 	i = 0;
@@ -269,8 +312,32 @@ char	*ft_link(t_filist *filist, t_roomlist *roomlist)
 	return (tunname);
 }
 
+char	*ft_beflink(t_filist *filist, t_roomlist *roomlist)
+{
+	char	*tunname;
+	int		i;
+	//int		tmp;
 
-void	ft_place(t_filist *filist, t_roomlist *roomlist)
+	i = 0;
+	//tmp = 0;
+	while ((filist->line)[i] != '-')
+	{
+		i++;
+	}
+	tunname = (char*)malloc(sizeof(char) * (i + 1));
+	//tmp = i;
+	i = 0;
+	while ((filist->line)[i] != '-')
+	{
+		tunname[i] = (filist->line)[i];
+		i++;
+	}
+	tunname[i] = '\0';
+	return (tunname);
+}
+
+
+void	ft_tunnels(t_filist *filist, t_roomlist *roomlist)
 {
 	int		i;
 	int		tunnbr;
@@ -312,7 +379,7 @@ void	ft_place(t_filist *filist, t_roomlist *roomlist)
 			}
 			filist = filist->next;
 		}
-		printf("tunnbr = %d, roomlist->name = %s\n", tunnbr, roomlist->name);
+		//printf("tunnbr = %d, roomlist->name = %s\n", tunnbr, roomlist->name);
 		roomlist->tunnels = (char**)malloc(sizeof(char*) * (tunnbr + 1));
 		roomlist = roomlist->next;
 		filist = filistart;
@@ -333,13 +400,66 @@ void	ft_place(t_filist *filist, t_roomlist *roomlist)
 			}
 			filist = filist->next;
 		}
-		roomlist->tunnels[i] = NULL;
+		(roomlist->tunnels)[i] = NULL;
 		roomlist = roomlist->next;
 		filist = filistart;
 		i = 0;
 	}
+	//(roomlist->tunnels)[i] = ft_link(filist, roomlist);
 
+
+	tunnbr = 0;
+	filist = filistart;
+	roomlist = roomlistart;
+	while (roomlist != NULL)
+	{
+		while (filist != NULL)
+		{
+			if (ft_disiz_beftunnel(filist, roomlist) == 1)
+			{
+				tunnbr++;
+			}
+			filist = filist->next;
+		}
+		roomlist->beftunnels = (char**)malloc(sizeof(char*) * (tunnbr + 1));
+		roomlist = roomlist->next;
+		filist = filistart;
+		tunnbr = 0;
+	}
+
+	roomlist = roomlistart;
+	i = 0;
+	filist = filistart;
+	tunnbr = 0;
+	while (roomlist != NULL)
+	{
+		while (filist != NULL)
+		{
+			if (ft_disiz_beftunnel(filist, roomlist) == 1)
+			{
+				(roomlist->beftunnels)[i] = ft_beflink(filist, roomlist);
+				i++;
+			}
+			filist = filist->next;
+		}
+		(roomlist->beftunnels)[i] = NULL;
+		roomlist = roomlist->next;
+		filist = filistart;
+		i = 0;
+	}
 }
+
+//place, max
+
+//calcul des places
+//si le next = end ou -2: 
+//malloc char** place + 1(end) + 1(NULL), !!une seule fois
+//max = place - 1,
+//place devient -2,
+//name sur way
+//si la place d'un predecesseur = max(et pas -1 ou -2), on y va
+//
+//refaisage
 
 
 int		main(void)
@@ -376,7 +496,7 @@ int		main(void)
 	roomlist->next = NULL;
 	ft_name(filistart, roomlist);
 	ft_place_start(filistart, roomlist);
-	ft_place(filistart, roomlist);
+	ft_tunnels(filistart, roomlist);
 	ft_show_roomlist(roomlist);
 
 

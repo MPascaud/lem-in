@@ -6,7 +6,7 @@
 /*   By: mpascaud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/10 20:44:23 by mpascaud          #+#    #+#             */
-/*   Updated: 2018/04/17 15:23:00 by mpascaud         ###   ########.fr       */
+/*   Updated: 2018/04/17 21:33:17 by mpascaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,8 +42,9 @@ typedef struct	s_filist
 
 typedef struct	s_roomlist
 {
+	char				**beftunnels;
 	char				**tunnels;
-	unsigned int		place;
+	int					place;
 	char				*name;
 	struct	s_roomlist	*previous;
 	struct	s_roomlist	*next;
