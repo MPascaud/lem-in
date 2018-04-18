@@ -6,7 +6,7 @@
 /*   By: mpascaud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/10 20:44:23 by mpascaud          #+#    #+#             */
-/*   Updated: 2018/04/18 20:30:05 by mpascaud         ###   ########.fr       */
+/*   Updated: 2018/04/18 23:12:27 by mpascaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ typedef struct	s_filist
 
 typedef struct	s_roomlist
 {
+	int					way;
 	char				**beftunnels;
 	char				**tunnels;
 	int					place;
@@ -51,6 +52,13 @@ typedef struct	s_roomlist
 	struct	s_roomlist	*previous;
 	struct	s_roomlist	*next;
 }				t_roomlist;
+
+typedef struct	s_waylist
+{
+
+	struct s_waylist	*previous;
+	struct s_waylist	*next;
+}				t_waylist;
 
 #endif
 

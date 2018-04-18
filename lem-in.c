@@ -6,7 +6,7 @@
 /*   By: mpascaud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/10 20:29:32 by mpascaud          #+#    #+#             */
-/*   Updated: 2018/04/18 21:50:58 by mpascaud         ###   ########.fr       */
+/*   Updated: 2018/04/18 23:30:17 by mpascaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -475,14 +475,21 @@ void	ft_tunnels(t_filist *filist, t_roomlist *roomlist)
 //place, max
 
 //calcul des places
-//si le next = end ou -2: 
-//malloc char** place + 1(end) + 1(NULL), !!une seule fois
+//si le next = end ou -2: place min = place + 1 
+//malloc char** place min + 1(end) + 1(NULL), !!une seule fois
 //max = place - 1,
 //place devient -2,
 //name sur way
 //si la place d'un predecesseur = max(et pas -1 ou -2), on y va
 //
 //refaisage
+
+
+
+
+
+
+
 
 
 //defilement roomlist
@@ -572,6 +579,17 @@ void	ft_place(t_filist *filist, t_roomlist* roomlist)
 		roomlist = roomlist->next;
 	}
 }
+
+//t_waylist*, progress
+//roomlist->way (0 pour normaux, 1 quand occupe, -1 quand start ou end)
+//on fait defiler roomlist
+//si place = 0, maillon de way
+//si place = 1 && (beftunnels->place = place - 1 || tunnels->place = place - 1), maillon en plus, roomlistart
+//idem si place = 2 etc
+//si place = -2 && blablabla, maillon en plus + maillon NULL,
+//MAIS si roomlist = NULL et que ya pas eu de maillon en plus depuis roomlistart : on supprime tous les maillons de way + dernier maillon de waylist remplace par NULL
+//
+
 
 int		main(void)
 {
