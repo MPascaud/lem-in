@@ -6,7 +6,7 @@
 /*   By: mpascaud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/10 20:29:32 by mpascaud          #+#    #+#             */
-/*   Updated: 2018/04/20 18:05:54 by mpascaud         ###   ########.fr       */
+/*   Updated: 2018/04/20 18:42:24 by mpascaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -667,7 +667,7 @@ int		ft_search_next(t_roomlist *roomlist, t_roomlist *roomlistart, int way)
 	{
 		if (roomlistart->place == roomlist->place + 1
 				&& roomlistart->taken == 0
-				&& roomlistart->way == 0
+				&& (roomlistart->way == 0 || roomlistart->way == way)
 				&& check_connection(roomlistart, roomlist) == 1)
 		{
 			connection = 1;
