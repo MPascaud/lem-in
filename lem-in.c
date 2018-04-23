@@ -6,7 +6,7 @@
 /*   By: mpascaud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/10 20:29:32 by mpascaud          #+#    #+#             */
-/*   Updated: 2018/04/20 18:42:24 by mpascaud         ###   ########.fr       */
+/*   Updated: 2018/04/23 18:35:37 by mpascaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -265,6 +265,8 @@ int		ft_disiz_tunnel(t_filist *filist, t_roomlist *roomlist)
 			return (0);
 		i++;
 	}
+	if ((filist->line)[i] != '-')
+		return (0);
 	return (1);
 }
 
@@ -299,6 +301,8 @@ int		ft_disiz_beftunnel(t_filist *filist, t_roomlist *roomlist)
 		i++;
 		j++;
 	}
+	if ((filist->line)[i] != '\0')
+		return (0);
 //	printf("filist->line = %s, roomlist->name = %s\n", filist->line, roomlist->name);
 
 	return (1);
@@ -498,7 +502,7 @@ void	ft_tunnels(t_filist *filist, t_roomlist *roomlist)
 //pour chacun : defilement des precedents; si precedent->place != -1 et -2, place = precedent->place + 1
 
 
-void	ft_check_previous_place(t_roomlist *roomlist, int i, t_roomlist *roomlistart)
+int		ft_check_previous_place(t_roomlist *roomlist, int i, t_roomlist *roomlistart)
 {
 	int		empty;
 
@@ -508,33 +512,56 @@ void	ft_check_previous_place(t_roomlist *roomlist, int i, t_roomlist *roomlistar
 	{
 		if (ft_strcmp((roomlist->beftunnels)[i], roomlistart->name) == 0)
 		{
-			//printf("roomlistart->name = %s, (roomlist->beftunnels)[i] = %s, i = %d \n", roomlistart->name, (roomlist->beftunnels)[i], i);
+			/*//printf("roomlistart->name = %s, (roomlist->beftunnels)[i] = %s, i = %d \n", roomlistart->name, (roomlist->beftunnels)[i], i);
 			if (roomlistart->place == -1 && (roomlist->place != -2) && roomlist->place != -1)
 			{
 				roomlistart->place = roomlist->place + 1;
 				return ;
 			}
+		}*/
+			if (roomlist->place != 0 && roomlistart->place != -1 && roomlistart->place != -2 && (roomlist->place == -1 || roomlist->place > roomlistart->place + 1))
+			{
+				roomlist->place = roomlistart->place + 1;
+				return (1);
+			}
+			if (roomlistart->place != 0 && roomlist->place != -1 && roomlist->place != -2 && (roomlistart->place == -1 || roomlistart->place > roomlist->place + 1))
+			{
+				roomlistart->place = roomlist->place + 1;
+				return (1);
+			}
 		}
 		roomlistart = roomlistart->next;
 	}
 	//return 1 si place = -1
+	return (0);
 }
 
-void	ft_check_next_place(t_roomlist *roomlist, int i, t_roomlist *roomlistart)
+int		ft_check_next_place(t_roomlist *roomlist, int i, t_roomlist *roomlistart)
 {
 	roomlistart = roomlistart->next;
 	while (roomlistart != NULL)
 	{
 		if (ft_strcmp((roomlist->tunnels)[i], roomlistart->name) == 0)
 		{
-			if ((roomlistart->place == -1 || (roomlistart->place > roomlist->place + 1)) && roomlist->place != -2 && roomlist->place != -1)
+			/*if ((roomlistart->place == -1 || (roomlistart->place > roomlist->place + 1)) && roomlist->place != -2 && roomlist->place != -1)
 			{
 				roomlistart->place = roomlist->place + 1;
 				return ;
+			}*/
+			if (roomlist->place != 0 && roomlistart->place != -1 && roomlistart->place != -2 && (roomlist->place == -1 || roomlist->place > roomlistart->place + 1))
+			{
+				roomlist->place = roomlistart->place + 1;
+				return (1);
+			}
+			if (roomlistart->place != 0 && roomlist->place != -1 && roomlist->place != -2 && (roomlistart->place == -1 || roomlistart->place > roomlist->place + 1))
+			{
+				roomlistart->place = roomlist->place + 1;
+				return (1);
 			}
 		}
 		roomlistart = roomlistart->next;
 	}
+	return (0);
 }
 
 
@@ -554,7 +581,12 @@ void	ft_place(t_filist *filist, t_roomlist* roomlist)
 	{
 		while ((roomlist->beftunnels)[i] != NULL)
 		{
-			ft_check_previous_place(roomlist, i, roomlistart);
+			if (ft_check_previous_place(roomlist, i, roomlistart) == 1)
+			{
+				roomlist = roomlistart;
+				//roomlist = roomlist->next;
+				break ;
+			}
 			//if (ft_check_previous_place(roomlist, i, roomlistart) == 1)
 			//{
 			//	ft_change_previous_place(roomlist);
@@ -574,7 +606,11 @@ void	ft_place(t_filist *filist, t_roomlist* roomlist)
 	{
 		while ((roomlist->tunnels)[i] != NULL)
 		{
-			ft_check_next_place(roomlist, i, roomlistart);
+			if (ft_check_next_place(roomlist, i, roomlistart) == 1)
+			{
+				roomlist = roomlistart;
+				break ;
+			}
 			i++;
 		}
 		i = 0;
@@ -628,73 +664,6 @@ int		check_connection(t_roomlist *roomlistart, t_roomlist *roomlist)
 	return (0);
 }
 
-int		ft_search_previous(t_roomlist *roomlist, t_roomlist *roomlistart, int way)
-{
-	roomlistart = roomlistart->next;
-	while (roomlistart != NULL)
-	{
-		if (roomlistart->place == roomlist->place - 1
-				&& roomlistart->taken == 0 
-				&& roomlistart->way == way
-				&& check_connection(roomlistart, roomlist) == 1)
-		{
-			//printf("COUCOU\n");
-			return (1);
-		}
-		roomlistart = roomlistart->next;
-	}
-	return (0);
-}
-
-//pour next : que place du next = place de l'actuel + 1 || -2;
-//            que taken du suivant = 0;
-//            que un tunnel de l'actuel = nom du suivant (ou l'inverse);
-//            que way du suivant = 0;
-//
-
-int		ft_search_next(t_roomlist *roomlist, t_roomlist *roomlistart, int way)
-{
-	int		connection;
-	int		end;
-	int		noway;
-
-	connection = 0;
-	end = 0;
-	noway = -1;
-
-	roomlistart = roomlistart->next;
-	while (roomlistart != NULL)
-	{
-		if (roomlistart->place == roomlist->place + 1
-				&& roomlistart->taken == 0
-				&& (roomlistart->way == 0 || roomlistart->way == way)
-				&& check_connection(roomlistart, roomlist) == 1)
-		{
-			connection = 1;
-		}
-		if (roomlistart->place == -2
-				&& check_connection(roomlistart, roomlist) == 1)
-		{
-			end = -2;
-		}
-		if (roomlistart->place == roomlist->place + 1
-				&& roomlistart->taken == 0
-				&& roomlistart->way == way
-				&& check_connection(roomlistart, roomlist) == 1)
-		{
-			noway = 0;
-		}
-
-		roomlistart = roomlistart->next;
-	}
-	if (end == -2)
-		return (-2);
-	if (connection == 1)
-		return (1);
-	if (noway == -1)
-		return (-1);
-	return (0);
-}
 
 
 void	ft_ways_to_zero(t_roomlist *roomlistart)
@@ -741,6 +710,123 @@ void	ft_ways_to_zero(t_roomlist *roomlistart)
 
 }
 
+void	ft_takens_to_one(t_roomlist *roomlistart, int way)
+{
+	roomlistart = roomlistart->next;
+	while (roomlistart != NULL)
+	{
+		if (roomlistart->way == way && roomlistart->place != 0 && roomlistart->place != -2)
+			roomlistart->taken = 1;
+		roomlistart = roomlistart->next;
+	}
+}
+
+
+
+int		ft_no_zero(t_roomlist *roomlistart)
+{
+	roomlistart = roomlistart->next;
+
+	while (roomlistart != NULL)
+	{
+		if (roomlistart->way == 0)
+		{
+			return (0);
+		}
+		roomlistart = roomlistart->next;
+	}
+
+	
+	return (1);
+}
+
+int		ft_search_previous(t_roomlist *roomlist, t_roomlist *roomlistart, int way)
+{
+	roomlistart = roomlistart->next;
+	while (roomlistart != NULL)
+	{
+		if (roomlistart->place == roomlist->place - 1
+				&& roomlistart->taken == 0 
+				&& roomlistart->way == way
+				&& check_connection(roomlistart, roomlist) == 1)
+		{
+			//printf("COUCOU\n");
+			return (1);
+		}
+		roomlistart = roomlistart->next;
+	}
+	return (0);
+}
+
+//pour next : que place du next = place de l'actuel + 1 || -2;
+//            que taken du suivant = 0;
+//            que un tunnel de l'actuel = nom du suivant (ou l'inverse);
+//            que way du suivant = 0;
+//
+
+/*int		ft_search_next(t_roomlist *roomlist, t_roomlist *roomlistart, int way)
+{
+	int		connection;
+	int		end;
+	int		noway;
+
+	connection = 0;
+	end = 0;
+	noway = -1;
+
+	roomlistart = roomlistart->next;
+	while (roomlistart != NULL)
+	{
+		if (roomlistart->place == roomlist->place + 1
+				&& roomlistart->taken == 0
+				&& (roomlistart->way == 0 || roomlistart->way == way)
+				&& check_connection(roomlistart, roomlist) == 1)
+		{
+			connection = 1;
+		}
+		if (roomlistart->place == -2
+				&& check_connection(roomlistart, roomlist) == 1)
+		{
+			end = -2;
+		}
+		if (roomlistart->place == roomlist->place + 1
+				&& roomlistart->taken == 0
+				&& roomlistart->way == way
+				&& check_connection(roomlistart, roomlist) == 1)
+		{
+			noway = 0;
+		}
+
+		roomlistart = roomlistart->next;
+	}
+	if (end == -2)
+		return (-2);
+	if (connection == 1)
+		return (1);
+	if (noway == -1)
+		return (-1);
+	return (0);
+}*/
+
+
+int		ft_search_next(t_roomlist *roomlist, t_roomlist *roomlistart, int way)
+{
+	roomlistart = roomlistart->next;
+	while (roomlistart != NULL)
+	{
+		if ((roomlistart->place == roomlist->place + 1 || roomlistart->place == -2)
+				&& roomlistart->taken == 0
+				&& (roomlistart->way == 0 || roomlistart->way == way)
+				&& check_connection(roomlistart, roomlist) == 1)
+		{
+			return (1);
+		}
+
+		roomlistart = roomlistart->next;
+	}
+	return (0);
+}
+
 int		ft_way(t_filist *filist, t_roomlist *roomlist, t_roomlist *roomlistart, int way)
 {
 	int		progress;
@@ -752,7 +838,7 @@ int		ft_way(t_filist *filist, t_roomlist *roomlist, t_roomlist *roomlistart, int
 	progress = 0;
 	while (roomlist != NULL)
 	{
-		if (roomlist->place == 0)
+		if (roomlist->place == 0 || roomlist->place == -2)
 		{
 			roomlist->way = way;
 		}
@@ -762,34 +848,59 @@ int		ft_way(t_filist *filist, t_roomlist *roomlist, t_roomlist *roomlistart, int
 	roomlist = roomlistart;
 	roomlist = roomlist->next;
 
-	while (1/*roomlist != NULL*/)//penser au -2(et au 0)
+	while (/*ft_no_zero(roomlistart) == 0*/1/*roomlist != NULL*/)//penser au -2(et au 0)
 	{
-		if (roomlist->way == 0 && roomlist->place != 0 && roomlist->taken == 0 && ft_search_previous(roomlist, roomlistart, way) == 1)
+		while (roomlist != NULL)
 		{
-			roomlist->way = way;
-			roomlist = roomlistart;
-			roomlist = roomlist->next;
-		}
+			if (roomlist->way == 0 && roomlist->place != 0 && roomlist->taken == 0 && ft_search_previous(roomlist, roomlistart, way) == 1)
+			{
+				printf("COUCOU1111111111\n");
+				roomlist->way = way;
+			//	roomlist = roomlistart;
+			//	roomlist = roomlist->next;
+			}
 
-		if (roomlist->way == way && roomlist->place != 0 && ft_search_next(roomlist, roomlistart, way) == 0)//si pas de connexion
-		{
-			roomlist->way = -1;
-			roomlist = roomlistart;
+			if (roomlist->way == way && roomlist->place != 0 && roomlist->place != -2 && ft_search_next(roomlist, roomlistart, way) == 0)//si pas de connexion avec un +1, ou qu'avec des -1
+			{
+				printf("COUCOU222222222\n");
+				roomlist->way = -1;
+			//	roomlist = roomlistart;
+			//	roomlist = roomlist->next;
+			}
+		/*	if (roomlist->way == way && ft_search_next(roomlist, roomlistart, way) == -2)//si une des places = -2
+			{
+				printf("COUCOU3333333333\n");
+				if (ft_no_zero(roomlistart) == 1)
+				{
+					//ft_ways_to_zero(roomlistart);
+					//ft_takens_to_one(roomlistart, way);
+					printf("RETURN 1\n");
+					return (1);
+				}
+			//	roomlist = roomlistart;
+			//	roomlist = roomlist->next;
+			}*/
+			if (roomlist->place == 0 && ft_search_next(roomlist, roomlistart, way) == -1)//si tous les ways = -1
+			{
+				printf("RETURN 0\n");
+				return (0);
+			}
+			//if (roomlist->next != NULL)
 			roomlist = roomlist->next;
 		}
-		if (roomlist->way == way && ft_search_next(roomlist, roomlistart, way) == -2)//si une des places = -2
+		if (ft_no_zero(roomlistart) == 0)
 		{
-			ft_ways_to_zero(roomlistart);
+			roomlist = roomlistart;
+			ft_show_roomlist(roomlist);
+			roomlist = roomlist->next;
+		}
+		else
+		{
+			//ft_ways_to_zero(roomlistart);
 			//ft_takens_to_one(roomlistart, way);
 			printf("RETURN 1\n");
 			return (1);
 		}
-		if (roomlist->place == 0 && ft_search_next(roomlist, roomlistart, way) == -1)//si tous les ways = -1
-		{
-			printf("RETURN 0\n");
-			return (0);
-		}
-		roomlist = roomlist->next;
 	}
 
 
@@ -805,6 +916,7 @@ void	ft_init(t_roomlist *roomlist)
 	while (roomlist != NULL)
 	{
 		//printf("coucou\n");
+		roomlist->place = -1;
 		roomlist->taken = 0;
 		roomlist->way = 0;
 		roomlist = roomlist->next;
@@ -849,13 +961,13 @@ int		main(void)
 
 
 	ft_name(filistart, roomlist);
+	ft_init(roomlist);
 	ft_place_start(filistart, roomlist);
 	ft_place_end(filistart, roomlist);
 	ft_tunnels(filistart, roomlist);
 	ft_place(filistart, roomlist);
 	
 
-	ft_init(roomlist);
 
 	//way = (t_way*)malloc(sizeof(t_way));
 	//way->way = NULL;
