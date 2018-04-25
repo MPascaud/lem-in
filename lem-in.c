@@ -6,7 +6,7 @@
 /*   By: mpascaud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/10 20:29:32 by mpascaud          #+#    #+#             */
-/*   Updated: 2018/04/25 18:43:26 by mpascaud         ###   ########.fr       */
+/*   Updated: 2018/04/25 22:03:41 by mpascaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -188,7 +188,7 @@ void	ft_place_start(t_filist *filist, t_roomlist *roomlist)
 	roomlist = roomlist->next;
 	while (filist != NULL)
 	{
-		if (ft_strstr(filist->line, "##start"))
+		if (ft_strstr(filist->line, "##start") && (filist->line)[7] == '\0')
 		{
 			//printf("COUCOU\n");
 			filist = filist->next;
@@ -214,7 +214,7 @@ void	ft_place_end(t_filist *filist, t_roomlist *roomlist)
 	roomlist = roomlist->next;
 	while (filist != NULL)
 	{
-		if (ft_strstr(filist->line, "##end"))
+		if (ft_strstr(filist->line, "##end") && (filist->line)[5] == '\0')
 		{
 			filist = filist->next;
 			while (roomlist != NULL)
@@ -379,7 +379,7 @@ void	ft_tunnels(t_filist *filist, t_roomlist *roomlist)
 	filistart = filist;
 	roomlist = roomlist->next;
 	roomlistart = roomlist;
-	while (filist != NULL)
+	/*while (filist != NULL)
 	{
 		while ((filist->line)[i] != '\0')
 		{
@@ -392,7 +392,7 @@ void	ft_tunnels(t_filist *filist, t_roomlist *roomlist)
 		}
 		filist = filist->next;
 		i = 0;
-	}
+	}*/
 	//printf("i = %d\n", i);
 	//printf("tunnbr = %d\n", tunnbr);
 	tunnbr = 0;
@@ -881,7 +881,7 @@ int		ft_search_first_reverse(t_roomlist *end, t_roomlist *roomlistart, int way)
 		}
 		roomlist = roomlist->next;
 	}
-
+//	printf("maxplace = %d\n", maxplace);
 	return (maxplace);
 }
 
@@ -905,7 +905,12 @@ void	ft_search_other_reverses(t_roomlist *roomlistart, int maxplace, int way)
 		}
 		roomlist = roomlist->next;
 	}
-	//printf("ODHGOEJGREJGROEIGH roomlist->name = %s\n", roomlist->name);
+/*	if (roomlist == NULL)
+	{
+		printf("okdfpjasjvpoesjrgpijewrp%d\n", maxplace);//<<<<<<<--------------------- end tout seul
+		return ;
+	}*/
+//	printf("ODHGOEJGREJGROEIGH roomlist->name = %s\n", roomlist->name);
 	
 	roomlist = roomlistart;
 	roomlist = roomlist->next;
@@ -950,7 +955,9 @@ int		ft_reverse(t_roomlist *roomlist, int way)
 		}
 		roomlist = roomlist->next;
 	}
-
+//	printf("maxplace = %d\n", maxplace);
+	if (maxplace == 0)
+		return (0);
 	roomlist = roomlistart;
 	roomlist = roomlist->next;
 
@@ -964,8 +971,23 @@ int		ft_reverse(t_roomlist *roomlist, int way)
 		roomlist = roomlist->next;
 	}*/
 
-	return (0);
+	return (1);
 }
+
+void	ft_reset(t_roomlist *roomlistart, int way)
+{
+	while (roomlistart != NULL)
+	{
+		if (!(roomlistart->taken == 1
+					&& roomlistart->way <= way
+					&& roomlistart->place > 0))
+		{
+			roomlistart->way = 0;
+		}
+		roomlistart = roomlistart->next;
+	}
+}
+
 
 int		ft_way(t_filist *filist, t_roomlist *roomlist, t_roomlist *roomlistart, int way)
 {
@@ -1020,11 +1042,11 @@ int		ft_way(t_filist *filist, t_roomlist *roomlist, t_roomlist *roomlistart, int
 			//	roomlist = roomlistart;
 			//	roomlist = roomlist->next;
 			}*/
-			if (roomlist->place == 0 && ft_search_next(roomlist, roomlistart, way) == -1)//si tous les ways = -1
+			/*if (roomlist->place == 0 && ft_search_next(roomlist, roomlistart, way) == -1)//si tous les ways = -1
 			{
 				printf("RETURN 0\n");
-				return (0);
-			}
+				return (0);??????????????????????????????????????????!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			}*/
 			//if (roomlist->next != NULL)
 			roomlist = roomlist->next;
 		}
@@ -1036,10 +1058,9 @@ int		ft_way(t_filist *filist, t_roomlist *roomlist, t_roomlist *roomlistart, int
 		}
 		else
 		{
-			//ft_ways_to_zero(roomlistart);
-			//ft_takens_to_one(roomlistart, way);
 			if (ft_reverse(roomlistart, way) == 1)
 			{
+				ft_reset(roomlistart, way);
 				printf("RETURN 1\n");
 				return (1);
 			}
@@ -1124,6 +1145,8 @@ int		main(void)
 	way = 1;
 	ft_way(filistart, roomlist, roomlistart, way);
 
+	/*way = 2;
+	ft_way(filistart, roomlist, roomlistart, way);*/
 
 	ft_show_roomlist(roomlist);
 
