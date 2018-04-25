@@ -6,7 +6,7 @@
 /*   By: mpascaud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/10 20:29:32 by mpascaud          #+#    #+#             */
-/*   Updated: 2018/04/23 18:35:37 by mpascaud         ###   ########.fr       */
+/*   Updated: 2018/04/25 18:43:26 by mpascaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -729,7 +729,7 @@ int		ft_no_zero(t_roomlist *roomlistart)
 
 	while (roomlistart != NULL)
 	{
-		if (roomlistart->way == 0)
+		if (roomlistart->way == 0 && roomlistart->place != -1)
 		{
 			return (0);
 		}
@@ -827,6 +827,146 @@ int		ft_search_next(t_roomlist *roomlist, t_roomlist *roomlistart, int way)
 	return (0);
 }
 
+
+int		ft_search_first_reverse(t_roomlist *end, t_roomlist *roomlistart, int way)
+{
+	int			maxplace;
+	t_roomlist	*roomlist;
+//	t_roomlist	*roomax;
+
+	maxplace = 0;
+	roomlist = roomlistart;
+	roomlist = roomlist->next;
+
+	while (roomlist != NULL)
+	{
+		if (roomlist->taken == 0
+				&& roomlist->way == way
+				&& roomlist->place > maxplace 
+				&& check_connection(end, roomlist) == 1)
+			maxplace = roomlist->place;
+		roomlist = roomlist->next;
+	}
+
+	roomlist = roomlistart;
+	roomlist = roomlist->next;
+//	roomlistart = roomlistart->next;
+	while (roomlist != NULL)
+	{
+		if (roomlist->taken == 0
+				&& roomlist->way == way
+				&& (roomlist->place != -1)
+				&& check_connection(end, roomlist) == 1)
+		{
+			if (roomlist->place < maxplace)
+			{
+				maxplace = roomlist->place;
+			}
+			//roomax = roomlist;
+		}
+		roomlist = roomlist->next;
+	}
+
+	roomlist = roomlistart;
+	roomlist = roomlist->next;
+	while (roomlist != NULL)
+	{
+		if (roomlist->taken == 0
+				&& roomlist->way == way
+				&& roomlist->place == maxplace
+				&& check_connection(end, roomlist) == 1)
+		{
+			roomlist->taken = 1;
+			break ;
+		}
+		roomlist = roomlist->next;
+	}
+
+	return (maxplace);
+}
+
+
+void	ft_search_other_reverses(t_roomlist *roomlistart, int maxplace, int way)
+{
+	t_roomlist	*roomlist;
+	t_roomlist	*roomax;
+
+	roomlist = roomlistart;
+	roomlist = roomlist->next;
+
+	while (roomlist != NULL)
+	{
+		if (roomlist->taken == 1
+				&& roomlist->way == way
+				&& roomlist->place == maxplace)
+		{
+			roomax = roomlist;
+			break ;
+		}
+		roomlist = roomlist->next;
+	}
+	//printf("ODHGOEJGREJGROEIGH roomlist->name = %s\n", roomlist->name);
+	
+	roomlist = roomlistart;
+	roomlist = roomlist->next;
+
+	while (roomlist != NULL)
+	{
+		if (roomlist->place == 0
+				&& check_connection(roomlist, roomax) == 1)
+		{
+			return ;
+		}
+		if (roomlist->taken == 0
+				&& roomlist->way == way
+				&& roomlist->place == roomax->place - 1
+				&& check_connection(roomlist, roomax) == 1)
+		{
+			roomlist->taken = 1;
+			roomax = roomlist;
+			roomlist = roomlistart;
+		}
+		roomlist = roomlist->next;
+	}
+}
+
+int		ft_reverse(t_roomlist *roomlist, int way)
+{
+	t_roomlist	*roomlistart;
+	t_roomlist	*roomway;
+	int		maxplace;
+
+	roomlistart = roomlist;
+	roomlist = roomlist->next;
+//	maxplace = 0;
+	while (roomlist != NULL)
+	{
+		if (roomlist->place == -2)
+		{
+			maxplace = ft_search_first_reverse(roomlist, roomlistart, way);
+		//	if (roomlist == NULL)
+		//		return (0);
+		//	roomlist->taken = 1;
+		}
+		roomlist = roomlist->next;
+	}
+
+	roomlist = roomlistart;
+	roomlist = roomlist->next;
+
+	ft_search_other_reverses(roomlistart, maxplace, way);
+
+/*	roomlist = roomlistart;
+	roomlist = roomlist->next;
+	while (roomlist != NULL)
+	{
+		if (roomlist->
+		roomlist = roomlist->next;
+	}*/
+
+	return (0);
+}
+
 int		ft_way(t_filist *filist, t_roomlist *roomlist, t_roomlist *roomlistart, int way)
 {
 	int		progress;
@@ -891,15 +1031,23 @@ int		ft_way(t_filist *filist, t_roomlist *roomlist, t_roomlist *roomlistart, int
 		if (ft_no_zero(roomlistart) == 0)
 		{
 			roomlist = roomlistart;
-			ft_show_roomlist(roomlist);
+			//ft_show_roomlist(roomlist);
 			roomlist = roomlist->next;
 		}
 		else
 		{
 			//ft_ways_to_zero(roomlistart);
 			//ft_takens_to_one(roomlistart, way);
-			printf("RETURN 1\n");
-			return (1);
+			if (ft_reverse(roomlistart, way) == 1)
+			{
+				printf("RETURN 1\n");
+				return (1);
+			}
+			else
+			{
+				printf("RETURN 2222222\n");
+				return (0);
+			}
 		}
 	}
 
