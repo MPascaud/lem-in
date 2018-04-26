@@ -6,7 +6,7 @@
 /*   By: mpascaud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/10 20:29:32 by mpascaud          #+#    #+#             */
-/*   Updated: 2018/04/26 20:10:32 by mpascaud         ###   ########.fr       */
+/*   Updated: 2018/04/26 23:54:14 by mpascaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -1029,7 +1029,7 @@ int		ft_way(t_filist *filist, t_roomlist *roomlist, t_roomlist *roomlistart, int
 		{
 			if (roomlist->way == 0 && roomlist->place != 0 && roomlist->taken == 0 && ft_search_previous(roomlist, roomlistart, way) == 1)
 			{
-				printf("COUCOU1111111111\n");
+		//		printf("COUCOU1111111111\n");
 				roomlist->way = way;
 			//	roomlist = roomlistart;
 			//	roomlist = roomlist->next;
@@ -1037,7 +1037,7 @@ int		ft_way(t_filist *filist, t_roomlist *roomlist, t_roomlist *roomlistart, int
 
 			if (/*!!!!!!!*/(roomlist->way == way || roomlist->way == 0) && roomlist->place != 0 && roomlist->place != -2 && (ft_search_next(roomlist, roomlistart, way) == 0 || ft_search_previous(roomlist, roomlistart, way) == -1))//si pas de connexion avec un +1, ou qu'avec des -1
 			{
-				printf("COUCOU222222222\n");
+		//		printf("COUCOU222222222\n");
 				roomlist->way = -1;
 			//	roomlist = roomlistart;
 			//	roomlist = roomlist->next;
@@ -1067,7 +1067,7 @@ int		ft_way(t_filist *filist, t_roomlist *roomlist, t_roomlist *roomlistart, int
 		{
 		//	printf("blop\n");
 			roomlist = roomlistart;
-			ft_show_roomlist(roomlist);
+	//		ft_show_roomlist(roomlist);
 			roomlist = roomlist->next;
 		}
 		else
@@ -1076,13 +1076,13 @@ int		ft_way(t_filist *filist, t_roomlist *roomlist, t_roomlist *roomlistart, int
 			{
 			//	ft_show_roomlist(roomlistart);
 				ft_reset(roomlistart, way);
-				printf("RETURN 1111\n");
+		//		printf("RETURN 1111\n");
 				return (1);
 			}
 			else
 			{
 			//	ft_show_roomlist(roomlistart);
-				printf("RETURN 2222222\n");
+		//		printf("RETURN 2222222\n");
 				return (0);
 			}
 		}
@@ -1108,6 +1108,126 @@ void	ft_init(t_roomlist *roomlist)
 	}
 }
 
+t_waylist	*ft_waylistnew(t_roomlist *roomlist, int way, t_waylist *waylist)
+{
+	t_waylist	*nextlink;
+
+	nextlink = (t_waylist*)malloc(sizeof(t_waylist));
+	nextlink->previous = waylist;
+	nextlink->next = NULL;
+	return (nextlink);
+}
+
+t_waylist	*ft_waylist(t_roomlist *roomlistart, t_roomlist *roomlist, int way)
+{
+	int		max;
+	t_waylist	*waylist;
+	t_waylist	*waylistart;
+	int		place;
+	char	*str;
+
+	max = way;
+//	way = 1;
+	place = 0;
+
+	waylist = (t_waylist*)malloc(sizeof(t_waylist));
+	waylist->name = NULL;
+	waylist->way = way;
+	waylist->place = -1;
+	waylist->previous = NULL;
+	waylist->next = NULL;
+	waylistart = waylist;
+
+	roomlist = roomlist->next;
+	while (roomlist != NULL)
+	{
+		if ((roomlist->place == 0 || roomlist->way == way) && roomlist->place == place)
+		{
+			waylist->next = ft_waylistnew(roomlist, way, waylist);
+			waylist = waylist->next;
+			waylist->place = roomlist->place;
+			waylist->way = roomlist->way;
+			if (waylist->place == 0)
+				waylist->way = way;
+			str = ft_strnew(ft_strlen(roomlist->name));
+			waylist->name = ft_strcpy(str, roomlist->name);
+//			printf("%s\n", waylist->name);
+			place++;
+			roomlist = roomlistart;
+		//	roomlist = roomlist->next;
+		}
+//		printf("%s\n", roomlist->name);
+		roomlist = roomlist->next;
+	}
+
+	roomlist = roomlistart;
+	roomlist = roomlist->next;
+	while (roomlist != NULL)
+	{
+		if (roomlist->place == -2)
+		{
+			waylist->next = ft_waylistnew(roomlist, way, waylist);
+			waylist = waylist->next;
+			waylist->place = roomlist->place;
+			waylist->way = way;
+			str = ft_strnew(ft_strlen(roomlist->name));
+			waylist->name = ft_strcpy(str, roomlist->name);
+	//		printf("%s\n", waylist->name);
+
+		}
+		roomlist = roomlist->next;
+	}
+	return (waylistart);
+}
+
+t_listlist	*ft_listlistnew(t_listlist *listlist, int way)
+{
+	t_listlist	*nextlink;
+
+	nextlink = (t_listlist*)malloc(sizeof(t_listlist));
+	nextlink->way = way;
+	nextlink->previous = listlist;
+	nextlink->next = NULL;
+	return (nextlink);
+}
+
+void	ft_listlist(t_listlist *listlist, t_roomlist *roomlistart, t_roomlist *roomlist, int way)
+{
+	int		max;
+
+	max = way;
+//	printf("max = %d\n", max);
+	way = 1;
+	while (way <= max)
+	{
+		listlist->next = ft_listlistnew(listlist, way);
+		listlist = listlist->next;
+		listlist->waylist = ft_waylist(roomlistart, roomlist, way);
+	//	printf("way = %d, place = %d, name = %s\n", listlist->waylist->way, listlist->waylist->place, listlist->waylist->name);
+	//	listlist = listlist->next;
+		way++;
+	}
+//	ft_waylist(roomlistart, roomlist, way);
+
+}
+
+
+void	ft_show_listlist(t_listlist *listlist)
+{
+	while (listlist != NULL)
+	{
+		while (listlist->waylist != NULL)
+		{
+			printf("way = %d, place = %d, name = %s\n", listlist->waylist->way, listlist->waylist->place, listlist->waylist->name);
+
+			listlist->waylist = (listlist->waylist)->next;
+		}
+		printf("\n\n");
+		listlist = listlist->next;
+	}
+}
+
+
 int		main(void)
 {
 	char		*tmp;
@@ -1115,6 +1235,7 @@ int		main(void)
 	t_filist	*filistart;
 	t_roomlist	*roomlist;
 	t_roomlist	*roomlistart;
+	t_listlist	*listlist;
 	int			way;
 //	t_waylist	*way;
 
@@ -1133,7 +1254,7 @@ int		main(void)
 		}
 		break ;
 	}
-	ft_show_filist(filistart);
+//	ft_show_filist(filistart);
 	
 	
 	roomlist = (t_roomlist*)malloc(sizeof(t_roomlist));
@@ -1159,15 +1280,23 @@ int		main(void)
 	//way->previous = NULL;
 	//way->next = NULL;
 	way = 1;
-	ft_way(filistart, roomlist, roomlistart, way);
+	while (ft_way(filistart, roomlist, roomlistart, way) == 1)
+	{
+		way++;
+	}
+	way--;
+	//ft_show_roomlist(roomlist);
 
-	way = 2;
-	ft_way(filistart, roomlist, roomlistart, way);
+	listlist = (t_listlist*)malloc(sizeof(t_listlist));
+	listlist->previous = NULL;
+	listlist->waylist = NULL;
+	listlist->next = NULL;
 
-	ft_show_roomlist(roomlist);
+	ft_listlist(listlist, roomlistart, roomlist, way);
+//	ft_waylist(roomlistart, roomlist, way);
 
 
-
+	ft_show_listlist(listlist);
 
 
 

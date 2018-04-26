@@ -6,7 +6,7 @@
 /*   By: mpascaud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/10 20:44:23 by mpascaud          #+#    #+#             */
-/*   Updated: 2018/04/19 17:12:54 by mpascaud         ###   ########.fr       */
+/*   Updated: 2018/04/26 23:33:46 by mpascaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,22 +57,24 @@ typedef struct	s_roomlist
 	struct	s_roomlist	*next;
 }				t_roomlist;
 
-typedef struct	s_way
-{
-	char	*name;
-	int		good;
-	int		taken;
-	struct	s_way	*previous;
-	struct	s_way	*next;
-
-}				t_way;
-
 typedef struct	s_waylist
 {
-	struct	s_way		*way;
+	char	*name;
+	int		way;
+	int		place;
 	struct	s_waylist	*previous;
 	struct	s_waylist	*next;
+
 }				t_waylist;
+
+typedef struct	s_listlist
+{
+	struct	s_waylist	*waylist;
+	int		way;
+	struct	s_listlist	*previous;
+	struct	s_listlist	*next;
+}				t_listlist;
+
 
 #endif
 
