@@ -6,7 +6,7 @@
 /*   By: mpascaud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/10 20:29:32 by mpascaud          #+#    #+#             */
-/*   Updated: 2018/04/25 22:03:41 by mpascaud         ###   ########.fr       */
+/*   Updated: 2018/04/26 20:10:32 by mpascaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -742,7 +742,10 @@ int		ft_no_zero(t_roomlist *roomlistart)
 
 int		ft_search_previous(t_roomlist *roomlist, t_roomlist *roomlistart, int way)
 {
+	t_roomlist	*tmp;
+
 	roomlistart = roomlistart->next;
+	tmp = roomlistart;
 	while (roomlistart != NULL)
 	{
 		if (roomlistart->place == roomlist->place - 1
@@ -755,7 +758,16 @@ int		ft_search_previous(t_roomlist *roomlist, t_roomlist *roomlistart, int way)
 		}
 		roomlistart = roomlistart->next;
 	}
-	return (0);
+	while (tmp != NULL)
+	{
+		if (tmp->place == roomlist->place - 1
+				&& tmp->taken == 0
+				&& tmp->way == 0
+				&& check_connection(tmp, roomlist) == 1)
+			return (0);
+		tmp = tmp->next;
+	}
+	return (-1);
 }
 
 //pour next : que place du next = place de l'actuel + 1 || -2;
@@ -937,6 +949,7 @@ void	ft_search_other_reverses(t_roomlist *roomlistart, int maxplace, int way)
 
 int		ft_reverse(t_roomlist *roomlist, int way)
 {
+	//printf("blop\n");
 	t_roomlist	*roomlistart;
 	t_roomlist	*roomway;
 	int		maxplace;
@@ -1022,7 +1035,7 @@ int		ft_way(t_filist *filist, t_roomlist *roomlist, t_roomlist *roomlistart, int
 			//	roomlist = roomlist->next;
 			}
 
-			if (roomlist->way == way && roomlist->place != 0 && roomlist->place != -2 && ft_search_next(roomlist, roomlistart, way) == 0)//si pas de connexion avec un +1, ou qu'avec des -1
+			if (/*!!!!!!!*/(roomlist->way == way || roomlist->way == 0) && roomlist->place != 0 && roomlist->place != -2 && (ft_search_next(roomlist, roomlistart, way) == 0 || ft_search_previous(roomlist, roomlistart, way) == -1))//si pas de connexion avec un +1, ou qu'avec des -1
 			{
 				printf("COUCOU222222222\n");
 				roomlist->way = -1;
@@ -1052,20 +1065,23 @@ int		ft_way(t_filist *filist, t_roomlist *roomlist, t_roomlist *roomlistart, int
 		}
 		if (ft_no_zero(roomlistart) == 0)
 		{
+		//	printf("blop\n");
 			roomlist = roomlistart;
-			//ft_show_roomlist(roomlist);
+			ft_show_roomlist(roomlist);
 			roomlist = roomlist->next;
 		}
 		else
 		{
 			if (ft_reverse(roomlistart, way) == 1)
 			{
+			//	ft_show_roomlist(roomlistart);
 				ft_reset(roomlistart, way);
-				printf("RETURN 1\n");
+				printf("RETURN 1111\n");
 				return (1);
 			}
 			else
 			{
+			//	ft_show_roomlist(roomlistart);
 				printf("RETURN 2222222\n");
 				return (0);
 			}
@@ -1145,8 +1161,8 @@ int		main(void)
 	way = 1;
 	ft_way(filistart, roomlist, roomlistart, way);
 
-	/*way = 2;
-	ft_way(filistart, roomlist, roomlistart, way);*/
+	way = 2;
+	ft_way(filistart, roomlist, roomlistart, way);
 
 	ft_show_roomlist(roomlist);
 
