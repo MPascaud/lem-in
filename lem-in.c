@@ -6,7 +6,7 @@
 /*   By: mpascaud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/10 20:29:32 by mpascaud          #+#    #+#             */
-/*   Updated: 2018/04/27 17:03:43 by mpascaud         ###   ########.fr       */
+/*   Updated: 2018/04/27 18:38:03 by mpascaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -1215,29 +1215,46 @@ void	ft_listlist(t_listlist *listlist, t_roomlist *roomlistart, t_roomlist *room
 
 void	ft_ants(t_listlist *listlist, t_filist *filistart)
 {
+	t_listlist	*tmp;
+	t_waylist	*waytmp;
+
+	tmp = listlist;
 	filistart = filistart->next;
-	listlist->ants = ft_atoi(filistart->line);
+	tmp->ants = ft_atoi(filistart->line);
+	while (tmp != NULL)
+	{
+		waytmp = tmp->waylist;
+		while (waytmp != NULL)
+		{
+			waytmp->ants = 0;
+			waytmp = waytmp->next;
+		}
+		tmp = tmp->next;
+	}
+//	printf("line = %s\n", filistart->line);
 }
 
 void	ft_show_listlist(t_listlist *listlist)
 {
 	t_listlist *tmp;
 	t_waylist *waytmp;
-	tmp = listlist->next;
+	tmp = listlist;
 	printf("ants = %d\n", tmp->ants);
+	printf("\n");
+	tmp = tmp->next;
 //	tmp = tmp->next;
 	while (tmp != NULL)
 	{
-		waytmp=tmp->waylist;
-		printf("ants = %d\n", tmp->ants);
-		printf("blop\n");
+		waytmp = tmp->waylist;
+	//	printf("ants = %d\n", tmp->ants);
+	//	printf("blop\n");
 		while (waytmp != NULL)
 		{
 			printf("way = %d, place = %d, name = %s, ants = %d\n", waytmp->way, waytmp->place, waytmp->name, waytmp->ants);
 
 			waytmp = waytmp->next;
 		}
-		printf("\n\n");
+		printf("\n");
 		tmp = tmp->next;
 	}
 }
