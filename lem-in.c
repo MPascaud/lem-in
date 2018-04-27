@@ -6,7 +6,7 @@
 /*   By: mpascaud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/10 20:29:32 by mpascaud          #+#    #+#             */
-/*   Updated: 2018/04/26 23:54:14 by mpascaud         ###   ########.fr       */
+/*   Updated: 2018/04/27 17:03:43 by mpascaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -1185,7 +1185,7 @@ t_listlist	*ft_listlistnew(t_listlist *listlist, int way)
 	t_listlist	*nextlink;
 
 	nextlink = (t_listlist*)malloc(sizeof(t_listlist));
-	nextlink->way = way;
+//	nextlink->way = way;
 	nextlink->previous = listlist;
 	nextlink->next = NULL;
 	return (nextlink);
@@ -1211,19 +1211,34 @@ void	ft_listlist(t_listlist *listlist, t_roomlist *roomlistart, t_roomlist *room
 
 }
 
+//void	ft_listlist_waylist_ants
+
+void	ft_ants(t_listlist *listlist, t_filist *filistart)
+{
+	filistart = filistart->next;
+	listlist->ants = ft_atoi(filistart->line);
+}
 
 void	ft_show_listlist(t_listlist *listlist)
 {
-	while (listlist != NULL)
+	t_listlist *tmp;
+	t_waylist *waytmp;
+	tmp = listlist->next;
+	printf("ants = %d\n", tmp->ants);
+//	tmp = tmp->next;
+	while (tmp != NULL)
 	{
-		while (listlist->waylist != NULL)
+		waytmp=tmp->waylist;
+		printf("ants = %d\n", tmp->ants);
+		printf("blop\n");
+		while (waytmp != NULL)
 		{
-			printf("way = %d, place = %d, name = %s\n", listlist->waylist->way, listlist->waylist->place, listlist->waylist->name);
+			printf("way = %d, place = %d, name = %s, ants = %d\n", waytmp->way, waytmp->place, waytmp->name, waytmp->ants);
 
-			listlist->waylist = (listlist->waylist)->next;
+			waytmp = waytmp->next;
 		}
 		printf("\n\n");
-		listlist = listlist->next;
+		tmp = tmp->next;
 	}
 }
 
@@ -1236,6 +1251,7 @@ int		main(void)
 	t_roomlist	*roomlist;
 	t_roomlist	*roomlistart;
 	t_listlist	*listlist;
+	t_listlist	*listlistart;
 	int			way;
 //	t_waylist	*way;
 
@@ -1291,12 +1307,37 @@ int		main(void)
 	listlist->previous = NULL;
 	listlist->waylist = NULL;
 	listlist->next = NULL;
+//	listlist->ants = 20;
+
 
 	ft_listlist(listlist, roomlistart, roomlist, way);
+	ft_ants(listlist, filistart);
 //	ft_waylist(roomlistart, roomlist, way);
+//	listlist = listlist->next;
+//	listlist = listlist->next;
 
+	listlistart = listlist;	
 
 	ft_show_listlist(listlist);
+//	ft_show_listlist(listlist);
+/*	while (listlist != NULL)
+	{
+		while (listlist->waylist->previous != NULL)
+			listlist->waylist = listlist->waylist->previous;
+		listlist = listlist->next;
+	}*/
+	listlist = listlistart;
+/*	while (listlist != NULL)
+	{
+		while (listlist->waylist->place != -1)
+		{
+			listlist->waylist = listlist->waylist->previous;
+		}
+		listlist = listlist->next;
+	}*/
+//	ft_show_listlist(listlist);
+	//ft_show_listlist(listlist);
+	//ft_show_listlist(listlist);
 
 
 

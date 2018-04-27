@@ -6,7 +6,7 @@
 /*   By: mpascaud <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/10 20:44:23 by mpascaud          #+#    #+#             */
-/*   Updated: 2018/04/26 23:33:46 by mpascaud         ###   ########.fr       */
+/*   Updated: 2018/04/27 15:51:40 by mpascaud         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ char			*ft_strncat(char *dest, const char *src, size_t n);
 int				ft_isdigit(int c);
 char			*ft_strstr(const char *haystack, const char *needle);
 int				ft_strcmp(const char *s1, const char *s2);
-
+int				ft_atoi(const char *str);
 
 typedef struct	s_filist
 {
@@ -62,6 +62,7 @@ typedef struct	s_waylist
 	char	*name;
 	int		way;
 	int		place;
+	int		ants;
 	struct	s_waylist	*previous;
 	struct	s_waylist	*next;
 
@@ -70,7 +71,7 @@ typedef struct	s_waylist
 typedef struct	s_listlist
 {
 	struct	s_waylist	*waylist;
-	int		way;
+	int		ants;
 	struct	s_listlist	*previous;
 	struct	s_listlist	*next;
 }				t_listlist;
